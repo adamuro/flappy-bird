@@ -22,6 +22,7 @@ public class Tube extends Sprite {
     private Rectangle topBounds;
     private Texture botTube;
     private Texture topTube;
+    public boolean passed;
 
     public Tube(float x) {
         this.rand = new Random();
@@ -32,6 +33,7 @@ public class Tube extends Sprite {
         this.topBounds = new Rectangle(topPosition.x, topPosition.y, WIDTH, HEIGHT);
         this.botTube = new Texture("bot_tube.png");
         this.topTube = new Texture("top_tube.png");
+        this.passed = false;
     }
 
     public void update(float delta) {
@@ -46,11 +48,12 @@ public class Tube extends Sprite {
     public void reposition(float x) {
         this.botPosition.set(x, rand.nextInt(MAX_Y) + MIN_Y);
         this.topPosition.set(x, botPosition.y + HEIGHT + GAP);
+        this.passed = false;
     }
 
     public void dispose() {
-        botTube.dispose();
-        topTube.dispose();
+        this.botTube.dispose();
+        this.topTube.dispose();
     }
 
     public Vector2 getBotPosition() { return botPosition; }

@@ -9,33 +9,44 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import java.util.Stack;
 
 public class Hud {
-    private SpriteBatch batch;
-    private FitViewport viewport;
-    private Array<Image> numbers;
     private Stage stage;
     private Table table;
+    private Array<Texture> numbers;
     private int score;
 
     public Hud(SpriteBatch batch) {
-        this.batch = batch;
-        this.score = 0;
-        this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, new OrthographicCamera());
+        FitViewport viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, new OrthographicCamera());
         this.numbers = new Array<>();
-        this.table = new Table();
         this.stage = new Stage(viewport, batch);
-        for(int i = 0; i < 10; i++)
-            numbers.add(numberImage(i));
+        this.table = new Table();
+        this.stage.addActor(table);
         this.table.setFillParent(true);
         this.table.top();
-        this.table.add(numbers.get(0)).padTop(10);
-        this.stage.addActor(table);
+        this.score = 0;
+        for(int i = 0; i < 10; i++) numbers.add(new Texture(numberTexturePath(i)));
+    }
+
+    public void update() {
+        this.table.clearChildren();
+        Stack<Integer> scoreDigits = numberToDigitStack(score);
+        if(scoreDigits.empty()) { table.add(numberImage(0)).padTop(10); return; }
+        while(!scoreDigits.empty()) table.add(numberImage(scoreDigits.pop())).padTop(10);
     }
 
     public void draw() { stage.draw(); }
 
-    private Image numberImage(int number) {
-        return new Image(new Texture("./numbers/".concat(String.valueOf(number)).concat(".png")));
+    public void dispose() { for(Texture number : numbers) number.dispose(); }
+
+    public void addScore() { score += 1; }
+
+    private Image numberImage(int number) { return new Image(numbers.get(number)); }
+    private String numberTexturePath(int number) { return "numbers/" + number + ".png"; }
+    private Stack<Integer> numberToDigitStack(int number) {
+        Stack<Integer> digits = new Stack<>();
+        for(; number > 0; number /= 10) digits.push(number % 10);
+        return digits;
     }
 }

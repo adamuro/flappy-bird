@@ -36,7 +36,9 @@ public class Bird {
         this.velocity.scl(1 / delta);
     }
 
-    public boolean collide(Rectangle bounds) { return this.bounds.overlaps(bounds); }
+    public boolean collides(Rectangle bounds) { return this.bounds.overlaps(bounds); }
+
+    public boolean passes(Tube tube) { return position.x > tube.getBotPosition().x + Tube.WIDTH; }
 
     public void jump() { this.velocity.y = 250; }
 

@@ -23,11 +23,10 @@ public class StartScreen implements Screen {
     private Table table;
     private ImageButton playButton;
 
+    // TODO: Create hud scene for play button
     public StartScreen(final FlappyBird game) {
         this.game = game;
         this.camera = new OrthographicCamera();
-        this.camera.position.x = (float)FlappyBird.WIDTH / 2;
-        this.camera.position.y = (float)FlappyBird.HEIGHT / 2;
         this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, camera);
         this.background = new Texture("background.png");
         this.stage = new Stage(viewport);
@@ -53,7 +52,8 @@ public class StartScreen implements Screen {
 
     @Override
     public void show() {
-
+        this.camera.position.x = (float)FlappyBird.WIDTH / 2;
+        this.camera.position.y = (float)FlappyBird.HEIGHT / 2;
     }
 
     @Override
@@ -63,16 +63,16 @@ public class StartScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.batch.setProjectionMatrix(stage.getCamera().combined);
-        game.batch.begin();
-        game.batch.draw(background, 0, 0);
-        game.batch.end();
-        stage.draw();
+        this.game.batch.setProjectionMatrix(stage.getCamera().combined);
+        this.game.batch.begin();
+        this.game.batch.draw(background, 0, 0);
+        this.game.batch.end();
+        this.stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
+        this.viewport.update(width, height);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class StartScreen implements Screen {
 
     @Override
     public void dispose() {
-        background.dispose();
-        stage.dispose();
+        this.background.dispose();
+        this.stage.dispose();
     }
 }

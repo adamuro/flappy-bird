@@ -19,43 +19,40 @@ public class PlayScreen implements Screen {
     private FlappyBird game;
     private OrthographicCamera camera;
     private FitViewport viewport;
-    private Texture background;
     private Hud hud;
     private Bird bird;
-    private Array<Tube> tubes;
+    private Texture background;
     private Array<Ground> grounds;
+    private Array<Tube> tubes;
 
     public PlayScreen(FlappyBird game) {
         this.game = game;
         this.camera = new OrthographicCamera();
-        this.camera.position.x = (float)FlappyBird.WIDTH / 2;
-        this.camera.position.y = (float)FlappyBird.HEIGHT / 2;
         this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, camera);
-        this.background = new Texture("background.png");
         this.hud = new Hud(game.batch);
         this.bird = new Bird(40, (float)FlappyBird.HEIGHT / 2);
+        this.background = new Texture("background.png");
         this.grounds = new Array<>();
         this.grounds.add(new Ground(0, 0));
         this.grounds.add(new Ground(Ground.WIDTH, 0));
         this.tubes = new Array<>();
-        for(int i = 0; i < TUBES; i++) {
-            tubes.add(new Tube(FlappyBird.WIDTH + i * TUBE_SPACING));
-        }
+        for(int i = 0; i < TUBES; i++) tubes.add(new Tube(FlappyBird.WIDTH + i * TUBE_SPACING));
     }
 
     public void handleInput(float delta) {
-        if(Gdx.input.justTouched()){
-            bird.jump();
-        }
+        if(Gdx.input.justTouched()) bird.jump();
     }
 
     public void update(float delta) {
         handleInput(delta);
-        camera.update();
+
         bird.update(delta);
+        camera.update();
+        hud.update();
+
         for(Ground ground : grounds) {
             ground.update(delta);
-            if(bird.collide(ground.getBounds())) {
+            if(bird.collides(ground.getBounds())) {
                 game.setScreen(new StartScreen(game));
                 dispose();
                 break;
@@ -66,7 +63,11 @@ public class PlayScreen implements Screen {
         }
         for(Tube tube : tubes) {
             tube.update(delta);
-            if(bird.collide(tube.getBotBounds()) || bird.collide(tube.getTopBounds())) {
+            if(bird.passes(tube) && !tube.passed) {
+                hud.addScore();
+                tube.passed = true;
+            }
+            if(bird.collides(tube.getBotBounds()) || bird.collides(tube.getTopBounds())) {
                 game.setScreen(new StartScreen(game));
                 dispose();
                 break;
@@ -79,7 +80,8 @@ public class PlayScreen implements Screen {
 
     @Override
     public void show() {
-
+        this.camera.position.x = (float)FlappyBird.WIDTH / 2;
+        this.camera.position.y = (float)FlappyBird.HEIGHT / 2;
     }
 
     @Override
@@ -89,10 +91,10 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.batch.setProjectionMatrix(camera.combined);
-        game.batch.begin();
-        game.batch.draw(background, 0, 0);
-        game.batch.draw(bird.getTexture(), bird.getPosition().x, bird.getPosition().y);
+        this.game.batch.setProjectionMatrix(camera.combined);
+        this.game.batch.begin();
+        this.game.batch.draw(background, 0, 0);
+        this.game.batch.draw(bird.getTexture(), bird.getPosition().x, bird.getPosition().y);
         for(Tube tube : tubes) {
             game.batch.draw(tube.getBotTexture(), tube.getBotPosition().x, tube.getBotPosition().y);
             game.batch.draw(tube.getTopTexture(), tube.getTopPosition().x, tube.getTopPosition().y);
@@ -100,13 +102,13 @@ public class PlayScreen implements Screen {
         for(Ground ground : grounds) {
             game.batch.draw(ground.getTexture(), ground.getPosition().x, ground.getPosition().y);
         }
-        game.batch.end();
-        hud.draw();
+        this.game.batch.end();
+        this.hud.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
+        this.viewport.update(width, height);
     }
 
     @Override
@@ -128,6 +130,7 @@ public class PlayScreen implements Screen {
     public void dispose() {
         for(Tube tube : tubes) tube.dispose();
         for(Ground ground : grounds) ground.dispose();
-        background.dispose();
+        this.background.dispose();
+        this.hud.dispose();
     }
 }
