@@ -5,8 +5,10 @@ import com.adamuro.flappy.scenes.Hud;
 import com.adamuro.flappy.sprites.Bird;
 import com.adamuro.flappy.sprites.Ground;
 import com.adamuro.flappy.sprites.Tube;
+import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,8 +19,8 @@ public class PlayScreen implements Screen {
     private static final int TUBES = 4;
     private static final int TUBE_SPACING = 150;
     private FlappyBird game;
-    private OrthographicCamera camera;
     private FitViewport viewport;
+    private Music soundtrack;
     private Hud hud;
     private Bird bird;
     private Texture background;
@@ -27,15 +29,15 @@ public class PlayScreen implements Screen {
 
     public PlayScreen(FlappyBird game) {
         this.game = game;
-        this.camera = new OrthographicCamera();
-        this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, camera);
-        this.hud = new Hud(game.batch);
-        this.bird = new Bird(40, (float)FlappyBird.HEIGHT / 2);
+        this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, new OrthographicCamera());
+        this.soundtrack = Gdx.audio.newMusic(Gdx.files.internal("audio/MASNO - GANG BASS BOOSTED.mp3"));
         this.background = new Texture("background.png");
+        this.bird = new Bird(40, (float)FlappyBird.HEIGHT / 2);
+        this.hud = new Hud(game.batch);
         this.grounds = new Array<>();
+        this.tubes = new Array<>();
         this.grounds.add(new Ground(0, 0));
         this.grounds.add(new Ground(Ground.WIDTH, 0));
-        this.tubes = new Array<>();
         for(int i = 0; i < TUBES; i++) tubes.add(new Tube(FlappyBird.WIDTH + i * TUBE_SPACING));
     }
 
@@ -47,7 +49,6 @@ public class PlayScreen implements Screen {
         handleInput(delta);
 
         bird.update(delta);
-        camera.update();
         hud.update();
 
         for(Ground ground : grounds) {
@@ -80,8 +81,10 @@ public class PlayScreen implements Screen {
 
     @Override
     public void show() {
-        this.camera.position.x = (float)FlappyBird.WIDTH / 2;
-        this.camera.position.y = (float)FlappyBird.HEIGHT / 2;
+        this.viewport.getCamera().position.x = (float)FlappyBird.WIDTH / 2;
+        this.viewport.getCamera().position.y = (float)FlappyBird.HEIGHT / 2;
+        this.soundtrack.setLooping(true);
+        this.soundtrack.play();
     }
 
     @Override
@@ -91,7 +94,7 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        this.game.batch.setProjectionMatrix(camera.combined);
+        this.game.batch.setProjectionMatrix(viewport.getCamera().combined);
         this.game.batch.begin();
         this.game.batch.draw(background, 0, 0);
         this.game.batch.draw(bird.getTexture(), bird.getPosition().x, bird.getPosition().y);
@@ -113,12 +116,12 @@ public class PlayScreen implements Screen {
 
     @Override
     public void pause() {
-
+        this.soundtrack.pause();
     }
 
     @Override
     public void resume() {
-
+        this.soundtrack.play();
     }
 
     @Override
@@ -131,6 +134,7 @@ public class PlayScreen implements Screen {
         for(Tube tube : tubes) tube.dispose();
         for(Ground ground : grounds) ground.dispose();
         this.background.dispose();
+        this.soundtrack.dispose();
         this.hud.dispose();
     }
 }

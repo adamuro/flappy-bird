@@ -12,7 +12,7 @@ public class FlappyBird extends Game {
 
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
+		this.batch = new SpriteBatch();
 		setScreen(new StartScreen(this));
 	}
 
@@ -23,6 +23,6 @@ public class FlappyBird extends Game {
 	
 	@Override
 	public void dispose () {
-		batch.dispose();
+		this.batch.dispose();
 	}
 }
