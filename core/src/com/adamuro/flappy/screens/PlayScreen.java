@@ -1,7 +1,9 @@
 package com.adamuro.flappy.screens;
 
 import com.adamuro.flappy.FlappyBird;
+import com.adamuro.flappy.scenes.GameOver;
 import com.adamuro.flappy.scenes.Hud;
+import com.adamuro.flappy.scenes.ScoreDisplay;
 import com.adamuro.flappy.sprites.Bird;
 import com.adamuro.flappy.sprites.Ground;
 import com.adamuro.flappy.sprites.Tube;
@@ -21,11 +23,12 @@ public class PlayScreen implements Screen {
     private FlappyBird game;
     private FitViewport viewport;
     private Music soundtrack;
-    private Hud hud;
+    private ScoreDisplay hud;
     private Bird bird;
     private Texture background;
     private Array<Ground> grounds;
     private Array<Tube> tubes;
+    private boolean update;
 
     public PlayScreen(FlappyBird game) {
         this.game = game;
@@ -38,6 +41,7 @@ public class PlayScreen implements Screen {
         this.tubes = new Array<>();
         this.grounds.add(new Ground(0, 0));
         this.grounds.add(new Ground(Ground.WIDTH, 0));
+        this.update = true;
         for(int i = 0; i < TUBES; i++) tubes.add(new Tube(FlappyBird.WIDTH + i * TUBE_SPACING));
     }
 
@@ -46,22 +50,26 @@ public class PlayScreen implements Screen {
     }
 
     public void update(float delta) {
+        this.hud.update();
+        if(!update) return;
+
         handleInput(delta);
 
-        bird.update(delta);
-        hud.update();
+        this.bird.update(delta);
 
         for(Ground ground : grounds) {
             ground.update(delta);
             if(bird.collides(ground.getBounds())) {
-                game.setScreen(new StartScreen(game));
-                dispose();
-                break;
+                this.hud = new GameOver(hud.getScore(), game);
+                this.update = false;
             }
             if(ground.getPosition().x < -Ground.WIDTH) {
                 ground.reposition(ground.getPosition().x + Ground.WIDTH * 2);
             }
         }
+
+        if(!update) return;
+
         for(Tube tube : tubes) {
             tube.update(delta);
             if(bird.passes(tube) && !tube.passed) {
@@ -69,8 +77,8 @@ public class PlayScreen implements Screen {
                 tube.passed = true;
             }
             if(bird.collides(tube.getBotBounds()) || bird.collides(tube.getTopBounds())) {
-                game.setScreen(new StartScreen(game));
-                dispose();
+                this.hud = new GameOver(hud.getScore(), game);
+                this.update = false;
                 break;
             }
             if(tube.getBotPosition().x < -Tube.WIDTH) {
