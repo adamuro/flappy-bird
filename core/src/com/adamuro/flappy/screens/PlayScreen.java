@@ -7,7 +7,6 @@ import com.adamuro.flappy.scenes.ScoreDisplay;
 import com.adamuro.flappy.sprites.Bird;
 import com.adamuro.flappy.sprites.Ground;
 import com.adamuro.flappy.sprites.Tube;
-import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
