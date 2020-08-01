@@ -58,6 +58,7 @@ public class Tube extends Sprite {
 
     public Vector2 getBotPosition() { return botPosition; }
     public Vector2 getTopPosition() { return topPosition; }
+    public Vector2 getPosition() { return botPosition; }
 
     public Rectangle getBotBounds() { return botBounds; }
     public Rectangle getTopBounds() { return topBounds; }

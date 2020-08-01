@@ -31,8 +31,8 @@ public class PlayScreen implements Screen {
 
     public PlayScreen(FlappyBird game) {
         this.game = game;
-        this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, new OrthographicCamera());
         this.soundtrack = Gdx.audio.newMusic(Gdx.files.internal("audio/MASNO - GANG BASS BOOSTED.mp3"));
+        this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, new OrthographicCamera());
         this.background = new Texture("background.png");
         this.bird = new Bird(40, (float)FlappyBird.HEIGHT / 2);
         this.hud = new Hud(game.batch);
@@ -40,6 +40,7 @@ public class PlayScreen implements Screen {
         this.tubes = new Array<>();
         this.grounds.add(new Ground(0, 0));
         this.grounds.add(new Ground(Ground.WIDTH, 0));
+        this.soundtrack.setLooping(true);
         this.update = true;
         for(int i = 0; i < TUBES; i++) tubes.add(new Tube(FlappyBird.WIDTH + i * TUBE_SPACING));
     }
@@ -49,16 +50,16 @@ public class PlayScreen implements Screen {
     }
 
     public void update(float delta) {
-        this.hud.update();
         if(!update) return;
 
-        handleInput(delta);
-
+        this.handleInput(delta);
+        this.hud.update();
         this.bird.update(delta);
-
+        //Update and check for collision with ground
         for(Ground ground : grounds) {
             ground.update(delta);
             if(bird.collides(ground.getBounds())) {
+                this.hud.dispose();
                 this.hud = new GameOver(hud.getScore(), game);
                 this.update = false;
             }
@@ -66,22 +67,22 @@ public class PlayScreen implements Screen {
                 ground.reposition(ground.getPosition().x + Ground.WIDTH * 2);
             }
         }
-
         if(!update) return;
-
+        //Update, check for collision with tubes and increase score if one was passed
         for(Tube tube : tubes) {
             tube.update(delta);
-            if(bird.passes(tube) && !tube.passed) {
-                hud.addScore();
+            if(bird.justPassed(tube)) {
                 tube.passed = true;
+                this.hud.increaseScore();
             }
             if(bird.collides(tube.getBotBounds()) || bird.collides(tube.getTopBounds())) {
+                this.hud.dispose();
                 this.hud = new GameOver(hud.getScore(), game);
                 this.update = false;
                 break;
             }
-            if(tube.getBotPosition().x < -Tube.WIDTH) {
-                tube.reposition(tube.getBotPosition().x + TUBES * TUBE_SPACING);
+            if(tube.getPosition().x < -Tube.WIDTH) {
+                tube.reposition(tube.getPosition().x + TUBES * TUBE_SPACING);
             }
         }
     }
@@ -90,7 +91,6 @@ public class PlayScreen implements Screen {
     public void show() {
         this.viewport.getCamera().position.x = (float)FlappyBird.WIDTH / 2;
         this.viewport.getCamera().position.y = (float)FlappyBird.HEIGHT / 2;
-        this.soundtrack.setLooping(true);
         this.soundtrack.play();
     }
 

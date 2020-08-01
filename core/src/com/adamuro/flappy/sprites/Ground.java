@@ -27,15 +27,15 @@ public class Ground extends Sprite {
         this.velocity.scl(1 / delta);
     }
 
-    public void dispose() { this.ground.dispose(); }
+    public void dispose() {
+        this.ground.dispose();
+    }
 
     public void reposition(float x) {
         this.position.set(x, 0);
     }
 
     public Vector2 getPosition() { return position; }
-
     public Rectangle getBounds() { return bounds; }
-
     public Texture getTexture() { return ground; }
 }

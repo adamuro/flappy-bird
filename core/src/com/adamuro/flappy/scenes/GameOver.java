@@ -20,33 +20,26 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import java.util.Stack;
 
 public class GameOver extends ScoreDisplay {
-    private FlappyBird game;
-    private Table gameOverTable;
-    private ImageButton restartButton;
-    private Image gameOver;
-
     public GameOver(final int score, final FlappyBird game) {
         super(game.batch);
-        this.gameOverTable = new Table();
-        Texture restartButtonTexture = new Texture("play.png");
-        this.restartButton = new ImageButton(new TextureRegionDrawable(restartButtonTexture));
-        this.gameOver = new Image(new Texture("game_over.png"));
-        this.gameOverTable.setFillParent(true);
-        this.gameOverTable.top();
-        this.gameOverTable.padTop(40);
-        this.gameOverTable.add(gameOver).row();
-        this.stage.addActor(gameOverTable);
-        this.game = game;
         this.score = score;
-        this.gameOverTable.add(restartButton).padTop(240);
-        this.restartButton.addListener(new ClickListener() {
+        Table gameOverTable = new Table();
+        Texture restartButtonTexture = new Texture("play.png");
+        ImageButton restartButton = new ImageButton(new TextureRegionDrawable(restartButtonTexture));
+        Image gameOver = new Image(new Texture("game_over.png"));
+        gameOverTable.setFillParent(true);
+        gameOverTable.top().padTop(40);
+        gameOverTable.add(gameOver).row();
+        gameOverTable.add(restartButton).padTop(240);
+        restartButton.addListener(new ClickListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 game.getScreen().dispose();
                 game.setScreen(new PlayScreen(game));
             }});
         Gdx.input.setInputProcessor(stage);
-        loadScoreToTable();
+        this.loadScoreToTable();
+        this.stage.addActor(gameOverTable);
         this.scoreTable.padBottom(220);
     }
 
@@ -56,10 +49,7 @@ public class GameOver extends ScoreDisplay {
     }
 
     @Override
-    public void draw() { stage.draw(); }
-
-    @Override
-    public void dispose() {
-
+    public void draw() {
+        stage.draw();
     }
 }

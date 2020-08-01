@@ -37,12 +37,9 @@ public class Bird {
     }
 
     public boolean collides(Rectangle bounds) { return this.bounds.overlaps(bounds); }
-
-    public boolean passes(Tube tube) { return position.x > tube.getBotPosition().x + Tube.WIDTH; }
-
+    public boolean justPassed(Tube tube) { return position.x > tube.getPosition().x + Tube.WIDTH && !tube.passed; }
     public void jump() { this.velocity.y = 250; }
 
     public Vector2 getPosition() { return position; }
-
     public TextureRegion getTexture() { return flyAnimation.getKeyFrame(stateTime, true); }
 }

@@ -19,8 +19,8 @@ public class StartScreen implements Screen {
 
     public StartScreen(final FlappyBird game) {
         this.game = game;
-        this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, new OrthographicCamera());
         this.soundtrack = Gdx.audio.newMusic(Gdx.files.internal("audio/MASNO - BANIA ale to klasyk polskiego hip-hopu (jak zapomnieć przeróbka powered by GBS).mp3"));
+        this.viewport = new FitViewport(FlappyBird.WIDTH, FlappyBird.HEIGHT, new OrthographicCamera());
         this.background = new Texture("background.png");
         this.menu = new MainMenu(game);
     }
